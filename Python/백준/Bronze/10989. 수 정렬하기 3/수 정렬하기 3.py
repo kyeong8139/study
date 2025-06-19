@@ -8,6 +8,7 @@ for i in range(n):
     num = int(sys.stdin.readline())
     cnts[num] += 1
 
+
 for i in range(1, length):
     for _ in range(cnts[i]):
-        print(i)
+        sys.stdout.write(f'{i}\n')
