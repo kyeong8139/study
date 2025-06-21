@@ -1,12 +1,15 @@
 import sys
 
 n = int(sys.stdin.readline())
-idx = 0
-cur = 666
+cnt = 0
+num = 666
 
-while idx < n:
-    if str(cur).__contains__("666"):
-        idx += 1
-    cur += 1
+while True:
+    if "666" in str(num):
+        cnt += 1
 
-print(cur - 1)
+    if cnt == n:
+        sys.stdout.write(str(num))
+        break
+
+    num += 1
