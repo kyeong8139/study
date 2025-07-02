@@ -23,9 +23,6 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int goal = Integer.parseInt(st.nextToken());
 
-        int[] dist = new int[n+1];
-        Arrays.fill(dist, Integer.MAX_VALUE);
-        PriorityQueue<Point> pq = new PriorityQueue<>((x, y) -> x.dist - y.dist);
         HashMap<Integer, List<Point>> points = new HashMap<>();
         points.put(0, new ArrayList<>());
         points.get(0).add(new Point(0, 0, 0, 0));
@@ -35,14 +32,21 @@ public class Main {
             int y = Integer.parseInt(st.nextToken());
             Point cur = new Point(i, x, y, 0);
 
-            if (!points.containsKey(x)) {
-                points.put(x, new ArrayList<>());
+            if (!points.containsKey(y)) {
+                points.put(y, new ArrayList<>());
             }
-            points.get(x).add(cur);
+            points.get(y).add(cur);
+        }
 
-            if (y == goal) {
-                dist[cur.id] = 0;
-                pq.add(cur);
+        int[] dist = new int[n+1];
+        Arrays.fill(dist, Integer.MAX_VALUE);
+        PriorityQueue<Point> pq = new PriorityQueue<>((x, y) -> x.dist - y.dist);
+        
+        List<Point> goals = points.get(goal);
+        if (goals != null) {
+            for (Point g : goals) {
+                dist[g.id] = 0;
+                pq.add(g);
             }
         }
 
@@ -52,12 +56,12 @@ public class Main {
             
             if (cur.x == 0 && cur.y == 0) break;
 
-            for (int i = cur.x - 2; i <= cur.x + 2; i++) {
+            for (int i = cur.y - 2; i <= cur.y + 2; i++) {
                 List<Point> nexts = points.get(i);
                 if (nexts == null) continue;
-                
+
                 for (Point next : nexts) {
-                    if ((Math.abs(cur.y-next.y) <= 2) && (dist[next.id] > cur.dist + 1)) {
+                    if ((Math.abs(cur.x-next.x) <= 2) && (dist[next.id] > cur.dist + 1)) {
                         dist[next.id] = cur.dist + 1;
                         pq.add(new Point(next.id, next.x, next.y, cur.dist + 1));
                     }
