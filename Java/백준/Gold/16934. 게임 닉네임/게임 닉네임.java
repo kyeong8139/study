@@ -1,10 +1,10 @@
 import java.io.*;
-import java.util.*;
 
 public class Main {
 
     static class Alias {
-        HashMap<Character, Alias> next = new HashMap<>();
+        int cnt = 0;
+        Alias[] next = new Alias[26];
     }
 
     public static void main(String[] args) throws IOException {
@@ -12,45 +12,45 @@ public class Main {
         StringBuilder sb = new StringBuilder();
         int n = Integer.parseInt(br.readLine());
 
-        HashMap<Character, Alias> head = new HashMap<>();
-        HashMap<String, Integer> cnts = new HashMap<>();
+        Alias[] head = new Alias[26];
         for (int user = 0; user < n; user++) {
             String name = br.readLine();
-            cnts.put(name, cnts.getOrDefault(name, 0) + 1);
-
             String result = null;
-            HashMap<Character, Alias> cur = head; 
+            Alias[] cur = head; 
 
-            int i = 0;
-            for (; i < name.length(); i++) {
-                char key = name.charAt(i);
-                if (!cur.containsKey(key)) {
-                    result = name.substring(0, i+1);
-                    break;
+            int pos = 0;
+            for (; pos < name.length(); pos++) {
+                int idx = name.charAt(pos) - 'a';
+                if (cur[idx] == null) {
+                    if (result == null) {
+                        result = name.substring(0, pos + 1);
+                    }
+                    cur[idx] = new Alias();
                 }
 
-                cur = cur.get(key).next;
-            }
-
-            for (; i < name.length(); i++) {
-                char key = name.charAt(i);
-                if (!cur.containsKey(key)) {
-                    cur.put(key, new Alias());
+                if (pos != name.length()-1) {
+                    cur = cur[idx].next;
                 }
-
-                cur = cur.get(key).next;
             }
 
+            pos--;
+            int idx = name.charAt(pos) - 'a';
+            if (cur[idx] == null) {
+                cur[idx] = new Alias();
+            }
+
+            Alias last = cur[idx];
+            last.cnt = last.cnt + 1;
             if (result == null) {
-                int cnt = cnts.get(name);
-                if (cnt == 1) {
+                if (last.cnt == 1) {
                     sb.append(name).append("\n");
                 } else {
-                    sb.append(name).append(cnt).append("\n");
+                    sb.append(name).append(last.cnt).append("\n");
                 }
             } else {
                 sb.append(result).append("\n");
             }
+
         }
 
         System.out.print(sb);
