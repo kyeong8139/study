@@ -4,10 +4,10 @@ import java.util.*;
 public class Main {
 
     static class Edge implements Comparable<Edge> {
-        int to;
+        Planet to;
         int dist;
 
-        public Edge (int to, int dist) {
+        public Edge (Planet to, int dist) {
             this.to = to;
             this.dist = dist;
         }
@@ -35,7 +35,6 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
 
         int n = Integer.parseInt(br.readLine());
-        Map<Integer, Planet> planetMap = new HashMap<>();
         planets = new TreeSet[3];
         planets[0] = new TreeSet<>((x, y) -> (x.pos[0] == y.pos[0]) ? x.id - y.id : x.pos[0] - y.pos[0]);
         planets[1] = new TreeSet<>((x, y) -> (x.pos[1] == y.pos[1]) ? x.id - y.id : x.pos[1] - y.pos[1]);
@@ -51,7 +50,6 @@ public class Main {
             planets[0].add(planet);
             planets[1].add(planet);
             planets[2].add(planet);
-            planetMap.put(id, planet);
         }
 
         parents = new int[n+1];
@@ -69,11 +67,11 @@ public class Main {
         long distSum = 0;
         while (!pq.isEmpty()) {
             Edge edge = pq.poll();
-            if (parents[edge.to] == 0) continue;
+            if (parents[edge.to.id] == 0) continue;
 
             distSum += edge.dist;
-            parents[edge.to] = 0;
-            addEdge(planetMap.get(edge.to), pq);
+            parents[edge.to.id] = 0;
+            addEdge(edge.to, pq);
             
             if (++cnt == n) break;
         }
@@ -81,35 +79,38 @@ public class Main {
         System.out.print(distSum);
     }
 
-    public static void addEdge(Planet cur, PriorityQueue<Edge> pq) {
+    public static void addEdge(Planet planet, PriorityQueue<Edge> pq) {
         for (int i = 0; i < 3; i++) {
             TreeSet<Planet> set = planets[i];
-            set.remove(cur);
-                
-            cur.id = 0;
+            set.remove(planet);
+            
+            Planet cur = new Planet(0, planet.pos);
             Planet near = set.ceiling(cur);
             while (near != null) {
                 if (parents[near.id] != 0) {
                     int nearDist = Math.abs(cur.pos[i] - near.pos[i]);
-                    pq.add(new Edge(near.id, nearDist));
+                    pq.add(new Edge(near, nearDist));
                     break;
                 }
 
                 set.remove(near);
-                near = set.ceiling(near);
+                cur.pos = near.pos;
+                near = set.ceiling(cur);
             }
 
             cur.id = 10_0001;
+            cur.pos = planet.pos;
             near = set.floor(cur);
             while (near != null) {
                 if (parents[near.id] != 0) {
                     int nearDist = Math.abs(cur.pos[i] - near.pos[i]);
-                    pq.add(new Edge(near.id, nearDist));
+                    pq.add(new Edge(near, nearDist));
                     break;
                 }
 
                 set.remove(near);
-                near = set.floor(near);
+                cur.pos = near.pos;
+                near = set.floor(cur);
             }
         }
     }
