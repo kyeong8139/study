@@ -17,32 +17,34 @@ public class Main {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         int n = Integer.parseInt(br.readLine());
 
-        PriorityQueue<Station> stations = new PriorityQueue<>((x, y) -> x.pos - y.pos);
+        Station[] stations = new Station[n+1];
         for (int i = 0; i < n; i++) {
             StringTokenizer st = new StringTokenizer(br.readLine());
             int pos = Integer.parseInt(st.nextToken());
             int fuel = Integer.parseInt(st.nextToken());
 
-            stations.add(new Station(pos, fuel));
+            stations[i] = new Station(pos, fuel);
         }
         
         StringTokenizer st = new StringTokenizer(br.readLine());
         int endPos = Integer.parseInt(st.nextToken());
-        stations.add(new Station(endPos, 0));
+        stations[n] = new Station(endPos, 0);
+        Arrays.sort(stations, (x, y) -> x.pos - y.pos);
 
+        int stationIdx = 0;
         int curFule = Integer.parseInt(st.nextToken());
         int curPos = 0;
 
         boolean isOk = true;
-        List<Station> visited = new ArrayList<>();
+        int visitCnt = 0;
         PriorityQueue<Station> notVisited = new PriorityQueue<>((x,  y) -> y.fuel - x.fuel);
-        while (!stations.isEmpty()) {
-            Station station = stations.poll();
+        while (stationIdx <= n) {
+            Station station = stations[stationIdx++];
             curFule -= (station.pos - curPos); 
             if (curFule < 0) {
                 while (!notVisited.isEmpty()){
                     Station prev = notVisited.poll();
-                    visited.add(prev);
+                    visitCnt++;
                     curFule += prev.fuel;
                     
                     if (curFule >= 0) {
@@ -61,9 +63,7 @@ public class Main {
         }
 
         int answer = -1;
-        if (isOk) {
-            answer = visited.size();
-        }
+        if (isOk) answer = visitCnt;
 
         System.out.print(answer);
     }
