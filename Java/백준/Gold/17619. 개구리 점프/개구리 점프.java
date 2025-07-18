@@ -33,7 +33,7 @@ public class Main {
 
         int n = Integer.parseInt(st.nextToken());
         int q = Integer.parseInt(st.nextToken());
-        PriorityQueue<Block> blocks = new PriorityQueue<>();
+        TreeSet<Block> blocks = new TreeSet<>();
         for (int id = 1; id <= n; id++) {
             st = new StringTokenizer(br.readLine());
             int xStart = Integer.parseInt(st.nextToken());
@@ -49,16 +49,17 @@ public class Main {
             parents[i] = i;
         }
         
-        Block prev = blocks.poll();
         while (!blocks.isEmpty()) {
-            Block cur = blocks.poll();
-
-            boolean movable = getMovable(prev, cur);
-            if (movable) {
-                parents[cur.id] = parents[prev.id];
+            Block prev = blocks.pollFirst();
+            Block cur = blocks.higher(prev);
+            while(!blocks.isEmpty() && cur != null) {
+                if (prev.xEnd < cur.xStart) break;
+    
+                union(cur, prev);
+                cur = blocks.higher(cur);
             }
 
-            prev = cur;
+            blocks.remove(prev);
         }
 
         StringBuilder sb = new StringBuilder();
@@ -79,12 +80,13 @@ public class Main {
         System.out.print(sb);
     }
 
-    public static boolean getMovable(Block prev, Block cur) {
-        if (prev.xEnd >= cur.xStart) {
-            return true;
-        }
+    public static void union(Block prev, Block cur) {
+        int prevParent = getParent(prev.id);
+        int curParent = getParent(cur.id);
 
-        return false; 
+        if (prevParent != curParent) {
+            parents[curParent] = prevParent;
+        }
     }
 
     public static int getParent(int child) {
