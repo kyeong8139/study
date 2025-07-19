@@ -11,6 +11,13 @@ public class Main {
             this.weight = weight;
             this.value = value;
         }
+
+        public boolean isMoreValuable(Diamond target) {
+            if (target.weight > this.weight && target.value < this.value) {
+                return true;
+            }
+            return false;
+        }
     }
 
     public static void main(String[] args) throws IOException {
@@ -29,32 +36,23 @@ public class Main {
                 diamonds[i] = new Diamond(weight, value);
             }
 
-            List<Diamond>[] dp = new List[n];
-            for(int i = 0; i < n; i++) {
-                dp[i] = new ArrayList<>();
-            }
-            
-            int cnt = 0;
+            int[] dp = new int[n];  // i번째 다이아몬드를 마지막으로 하는 가장 긴 수열의 길이
+            Arrays.fill(dp, 1);
+
             for (int i = 0; i < n; i++) {
                 Diamond cur = diamonds[i];
-                
-                int curIdx = 0;
-                for (List<Diamond> list : dp) {
-                    boolean isValuable = false;
-                    for (Diamond dia : list) {
-                        if (dia.weight < cur.weight && dia.value > cur.value) {
-                            isValuable = true;
-                            break;
-                        }
+                for (int j = i+1; j < n; j++) {
+                    if (cur.isMoreValuable(diamonds[j])) {
+                        dp[j] = Math.max(dp[j], dp[i]+1);
                     }
-
-                    if (!isValuable) break;
-                    curIdx++;
                 }
-                dp[curIdx].add(cur);
-                if (curIdx == cnt) cnt++;
             }
-            sb.append(cnt).append("\n");
+
+            int answer = 1;
+            for (int length : dp) {
+                answer = Math.max(answer, length);
+            }
+            sb.append(answer).append("\n");
             
         }
         System.out.print(sb);
