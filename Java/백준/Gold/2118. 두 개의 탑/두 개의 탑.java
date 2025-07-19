@@ -19,20 +19,23 @@ public class Main {
             circleSum[i] = circleSum[i-1] + dist[i];
         }
         
+        int left = 1;
+        int right = 1;
         int total = circleSum[circleSum.length - 1];
         int answer = 0;
-        for (int left = 1; left < n; left++) {
-            int right = left+1;
-            while (right <= n) {    
-                int circleDist = circleSum[right] - circleSum[left];
-                int antiCircleDist = total - circleDist;
-                int curDist = Math.min(circleDist, antiCircleDist);
-                answer = Math.max(answer, curDist);
-                
-                if (circleDist >= antiCircleDist) break;
+        while (left <= right) {
+            if (right == n+1) break;
+
+            int circleDist = circleSum[right] - circleSum[left];
+            int antiCircleDist = total - circleDist;
+            int curDist = Math.min(circleDist, antiCircleDist);
+            answer = Math.max(answer, curDist);
+
+            if (circleDist > antiCircleDist) {
+                left++;
+            } else {
                 right++;
             }
-
         }
 
         System.out.print(answer);
