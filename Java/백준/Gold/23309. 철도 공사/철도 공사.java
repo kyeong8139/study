@@ -3,18 +3,6 @@ import java.io.*;
 
 public class Main {
 
-    static class Station {
-        int id;
-        Station prev;
-        Station next;
-
-        public Station(int id, Station prev, Station next) {
-            this.id = id;
-            this.prev = prev;
-            this.next = next;
-        }
-    }
-
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
@@ -34,13 +22,13 @@ public class Main {
         for (int i = 1; i < n; i++) {
             int curId = Integer.parseInt(st.nextToken());
             prev[curId] = prevId; 
-
             next[prevId] = curId;
             prevId = curId;
         }
         prev[headId] = prevId;
         next[prevId] = headId;
 
+        StringBuilder sb = new StringBuilder();
         for (int cmd = 0; cmd < m; cmd++) {
             st = new StringTokenizer(br.readLine());
             String command = st.nextToken();
@@ -48,7 +36,7 @@ public class Main {
 
             switch(command) {
                 case "BN":
-                    bw.write(String.valueOf(next[curId]));
+                    sb.append(next[curId]);
                     int newId = Integer.parseInt(st.nextToken());
 
                     prev[newId] = curId;
@@ -58,7 +46,7 @@ public class Main {
                     next[curId] = newId;
                     break;
                 case "BP":
-                    bw.write(String.valueOf(prev[curId]));
+                    sb.append(prev[curId]);
                     newId = Integer.parseInt(st.nextToken());
 
                     prev[newId] = prev[curId];
@@ -68,20 +56,21 @@ public class Main {
                     prev[curId] = newId; 
                     break;
                 case "CN":
-                    bw.write(String.valueOf(next[curId]));
+                    sb.append(next[curId]);
 
                     next[curId] = next[next[curId]];
                     prev[next[curId]] = curId;
                     break;
                 case "CP":
-                    bw.write(String.valueOf(prev[curId]));
+                    sb.append(prev[curId]);
 
                     prev[curId] = prev[prev[curId]];
                     next[prev[curId]] = curId;
                     break;
             }
-            bw.newLine();
+            sb.append("\n");
         }
+        bw.write(sb.toString());
         bw.flush();
         bw.close();
     }
