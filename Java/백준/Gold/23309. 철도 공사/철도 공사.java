@@ -22,68 +22,62 @@ public class Main {
         int n = Integer.parseInt(st.nextToken());
         int m = Integer.parseInt(st.nextToken());
 
-        Station[] stations = new Station[100_0001];
+        int[] next = new int[100_0001];
+        int[] prev = new int[100_0001];
+
         st = new StringTokenizer(br.readLine());
+        int headId = Integer.parseInt(st.nextToken());
+        next[headId] = headId;
+        prev[headId] = headId;
 
-        int id = Integer.parseInt(st.nextToken());
-        Station head = new Station(id, null, null);
-        head.prev = head;
-        head.next = head;
-        stations[id] = head;
-
-        Station prev = head;
+        int prevId = headId;
         for (int i = 1; i < n; i++) {
-            id = Integer.parseInt(st.nextToken());
-            Station cur = new Station(id, prev, head);
-            stations[id] = cur;
+            int curId = Integer.parseInt(st.nextToken());
+            prev[curId] = prevId; 
 
-            prev.next = cur;
-            prev = cur;
+            next[prevId] = curId;
+            prevId = curId;
         }
-        head.prev = prev;
+        prev[headId] = prevId;
+        next[prevId] = headId;
 
         for (int cmd = 0; cmd < m; cmd++) {
             st = new StringTokenizer(br.readLine());
             String command = st.nextToken();
-            int i = Integer.parseInt(st.nextToken());
-            Station cur = stations[i];
+            int curId = Integer.parseInt(st.nextToken());
 
             switch(command) {
                 case "BN":
-                    bw.write(String.valueOf(cur.next.id));
-                    id = Integer.parseInt(st.nextToken());
-                    if (stations[id] != null) continue;
+                    bw.write(String.valueOf(next[curId]));
+                    int newId = Integer.parseInt(st.nextToken());
 
-                    Station newStation = new Station(id, cur, cur.next);
-                    cur.next.prev = newStation;
-                    cur.next = newStation;
-                    stations[id] = newStation;
+                    prev[newId] = curId;
+                    next[newId] = next[curId];
+
+                    prev[next[curId]] = newId;
+                    next[curId] = newId;
                     break;
                 case "BP":
-                    bw.write(String.valueOf(cur.prev.id));
-                    id = Integer.parseInt(st.nextToken());
-                    if (stations[id] != null) continue;
+                    bw.write(String.valueOf(prev[curId]));
+                    newId = Integer.parseInt(st.nextToken());
 
-                    newStation = new Station(id, cur.prev, cur);
-                    cur.prev.next = newStation;
-                    cur.prev = newStation;
-                    stations[id] = newStation;
+                    prev[newId] = prev[curId];
+                    next[newId] = curId;
+
+                    next[prev[curId]] = newId;
+                    prev[curId] = newId; 
                     break;
                 case "CN":
-                    int targetId = cur.next.id;
-                    bw.write(String.valueOf(targetId));
+                    bw.write(String.valueOf(next[curId]));
 
-                    cur.next = cur.next.next;
-                    cur.next.prev = cur;
-                    stations[targetId] = null;
+                    next[curId] = next[next[curId]];
+                    prev[next[curId]] = curId;
                     break;
                 case "CP":
-                    targetId = cur.prev.id;
-                    bw.write(String.valueOf(targetId));
+                    bw.write(String.valueOf(prev[curId]));
 
-                    cur.prev = cur.prev.prev;
-                    cur.prev.next = cur;
-                    stations[targetId] = null;
+                    prev[curId] = prev[prev[curId]];
+                    next[prev[curId]] = curId;
                     break;
             }
             bw.newLine();
