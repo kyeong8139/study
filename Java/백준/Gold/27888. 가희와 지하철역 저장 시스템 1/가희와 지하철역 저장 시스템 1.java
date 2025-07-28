@@ -9,13 +9,15 @@ public class Main {
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        StringBuilder sb = new StringBuilder();
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
         int n = Integer.parseInt(br.readLine());
 
         for (int i = 0; i < n; i++) {
             String station = br.readLine();
             featureOfStation.put(station, 0);   
         }
+    
+        initFeatureCnts(0, 0);
         featureCnts.put(-1, 0);
 
         int m = Integer.parseInt(br.readLine());
@@ -33,20 +35,32 @@ public class Main {
                     int key = 0;
                     features = st.nextToken().split(",");
                     for (String feature : features) {
-                        int featureId = featureIds.getOrDefault(feature, -1);
-                        if (featureId == -1) {
+                        if (!featureIds.containsKey(feature)) {
                             key = -1;
                             break;
-                        } 
+                        }
 
+                        int featureId = featureIds.get(feature);
                         key |= 1 << featureId;
                     }
-                    int answer = featureCnts.getOrDefault(key, 0);
-                    sb.append(answer).append("\n");
+                    int answer = featureCnts.get(key);
+                    bw.write(String.valueOf(answer));
+                    bw.newLine();
                     break;
             }
         }
-        System.out.print(sb);
+        bw.flush();
+        bw.close();
+    }
+
+    public static void initFeatureCnts(int depth, int cur) {
+        if (depth == 9) {
+            featureCnts.put(cur, 0);
+            return;
+        }
+        
+        initFeatureCnts(depth + 1, cur);
+        initFeatureCnts(depth + 1, cur | (1 << depth));
     }
 
     public static void deleteFeature(String station) {
@@ -74,7 +88,7 @@ public class Main {
         if (depth == featureIds.size()) {
             int cnt = 0;
             if (isInsert) {
-                cnt = featureCnts.getOrDefault(cur, 0) + 1; 
+                cnt = featureCnts.get(cur) + 1; 
             } else {
                 cnt = featureCnts.get(cur) - 1;
             }
