@@ -17,8 +17,7 @@ public class Main {
             featureOfStation.put(station, 0);   
         }
     
-        initFeatureCnts(0, 0);
-        featureCnts.put(-1, 0);
+        initFeatureCnts();
 
         int m = Integer.parseInt(br.readLine());
         for (int i = 0; i < m; i++) {
@@ -53,21 +52,21 @@ public class Main {
         bw.close();
     }
 
-    public static void initFeatureCnts(int depth, int cur) {
-        if (depth == 9) {
-            featureCnts.put(cur, 0);
-            return;
+    public static void initFeatureCnts() {
+        int features = 0;
+        for (int i = 0; i < 9; i++) {
+            features |= (1 << i);
         }
-        
-        initFeatureCnts(depth + 1, cur);
-        initFeatureCnts(depth + 1, cur | (1 << depth));
+
+        for (int i = features; i > 0; i = (i-1) & features) {
+            featureCnts.put(i, 0);
+        }
+        featureCnts.put(-1, 0);
     }
 
     public static void deleteFeature(String station) {
         int features = featureOfStation.get(station);
-        if (features != 0) {
-            updateFeature(features, 0, 0, false);
-        }
+        updateFeature(features, -1);
     }
 
     public static void insertFeature(String station, String[] featureArr) {
@@ -81,25 +80,12 @@ public class Main {
         }
         
         featureOfStation.put(station, features);
-        updateFeature(features, 0, 0, true);
+        updateFeature(features, 1);
     }
 
-    private static void updateFeature(int features, int depth, int cur, boolean isInsert) {
-        if (depth == featureIds.size()) {
-            int cnt = 0;
-            if (isInsert) {
-                cnt = featureCnts.get(cur) + 1; 
-            } else {
-                cnt = featureCnts.get(cur) - 1;
-            }
-            featureCnts.put(cur, cnt);
-            return;
-        }
-
-        updateFeature(features, depth + 1, cur, isInsert);
-        if ((features & (1 << depth)) != 0) {
-            int next = (cur | (1 << depth));
-            updateFeature(features, depth + 1, next, isInsert);
+    private static void updateFeature(int features, int value) {
+        for (int i = features; i > 0; i = (i-1) & features) {
+            featureCnts.put(i, featureCnts.get(i) + value);
         }
     }
 }
