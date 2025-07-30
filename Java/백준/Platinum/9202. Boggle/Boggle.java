@@ -24,14 +24,12 @@ public class Main {
     }
 
     static class Word {
-        int prevPos;
         int pos;
+        Node curNode;
         int visited;
         Word prevWord;
-        Node curNode;
 
-        public Word(int startPos, int pos, int visited, Word prev, Node cur) {
-            this.prevPos = startPos;
+        public Word(int pos, int visited, Word prev, Node cur) {
             this.pos = pos;
             this.visited = visited;
             this.prevWord = prev;
@@ -39,7 +37,10 @@ public class Main {
         }
     }
 
-    static int[][] dirs = {{1, 0}, {-1, 0}, {0, 1}, {0, -1}, {1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+    static int[] rightDirs = {1, -3, 5};
+    static int[] leftDirs = {-1, 3, -5};
+    static int[] colDirs = {4, -4};
+    static char[] board = new char[16];
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
@@ -63,22 +64,22 @@ public class Main {
         br.readLine();
         int m = Integer.parseInt(br.readLine());
         for (int round = 0; round < m; round++) {
-            char[][] board = new char[4][4];
-            for (int row = 0; row < board.length; row++) {
-                board[row] = br.readLine().toCharArray();
+            int idx = 0;
+            for (int i = 0; i < 4; i++) {
+                char[] input = br.readLine().toCharArray();
+                for (char c : input) {
+                    board[idx++] = c;
+                }
             }
 
             Queue<Word> queue = new ArrayDeque<>();
-            for (int row = 0; row < board.length; row++) {
-                for (int col = 0; col < board[row].length; col++) {
-                    int idx = board[row][col] - 'A';
-                    Node cur = head.nextNodes[idx];
-                    if (cur == null) continue;
+            for (int pos = 0; pos < board.length; pos++) {
+                idx = board[pos] - 'A';
+                Node node = head.nextNodes[idx];
+                if (node == null) continue;
 
-                    int pos = getPos(row, col);
-                    Word word = new Word(pos, pos, 1 << pos, null, cur);
-                    queue.add(word);
-                }
+                Word word = new Word(pos, 1 << pos, null, node);
+                queue.add(word);
             }
 
             Set<String> set = new HashSet<>();
@@ -87,13 +88,9 @@ public class Main {
                 if (word.curNode.isEnd) {
                     StringBuilder sb = new StringBuilder();
                     Word curWord = word;
-                    int curRow;
-                    int curCol;
                     while (true) {
-                        int curPos = curWord.pos;
-                        curRow = curPos / 4;
-                        curCol = curPos % 4;
-                        sb.append(board[curRow][curCol]);
+                        char alphabet = board[curWord.pos];
+                        sb.append(alphabet);
 
                         if (curWord.prevWord == null) break;
                         curWord = curWord.prevWord;
@@ -103,17 +100,29 @@ public class Main {
 
                 if (Integer.bitCount(word.visited) == 8) continue;
 
-                for (int[] dir : dirs) {
-                    int nextRow = word.pos / 4 + dir[0];
-                    int nextCol = word.pos % 4 + dir[1];
-                    int nextPos = getPos(nextRow, nextCol);
-                    if (nextRow < 0 || nextCol < 0 || nextRow >= board.length || nextCol >= board[nextRow].length || (word.visited & (1 << nextPos)) != 0) continue;
-                    
-                    int nextIdx = board[nextRow][nextCol] - 'A';
-                    Node nextNode = word.curNode.nextNodes[nextIdx];
-                    if (nextNode == null) continue;
-                    int nextVisited = word.visited | (1 << nextPos);
-                    queue.add(new Word(word.pos, nextPos, nextVisited, word, nextNode));
+                for (int dir : colDirs) {
+                    Word nextWord = getNextWord(word, dir);
+                        if (nextWord != null) {
+                            queue.add(nextWord);
+                        }
+                }
+
+                if (word.pos % 4 != 3) {
+                    for (int dir : rightDirs) {
+                        Word nextWord = getNextWord(word, dir);
+                        if (nextWord != null) {
+                            queue.add(nextWord);
+                        }
+                    }
+                }
+
+                if (word.pos % 4 != 0) {
+                    for (int dir : leftDirs) {
+                        Word nextWord = getNextWord(word, dir);
+                        if (nextWord != null) {
+                            queue.add(nextWord);
+                        }
+                    }
                 }
             }
 
@@ -133,7 +142,15 @@ public class Main {
         bw.close();
     }
 
-    public static int getPos(int row, int col) {
-        return (row * 4) + col;
+    public static Word getNextWord(Word word, int dir) {
+        int nextPos = word.pos + dir;
+        if (nextPos < 0 || nextPos >= 16 || ((word.visited & (1 << nextPos)) != 0)) return null;
+                        
+        int nextIdx = board[nextPos] - 'A';
+        Node nextNode = word.curNode.nextNodes[nextIdx];
+        if (nextNode == null) return null;
+                        
+        int nextVisited = word.visited | (1 << nextPos);
+        return new Word(nextPos, nextVisited, word, nextNode);
     }
 }
