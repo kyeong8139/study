@@ -3,12 +3,12 @@ import java.util.*;
 
 public class Main {
 
-    static long initHash = 31L;
+    static int initHash = 31;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        Map<Long, List<String>>[] maps = new HashMap[2];
+        Map<Integer, List<String>>[] maps = new HashMap[2];
 
         while (true) {
             String input = br.readLine();
@@ -19,9 +19,9 @@ public class Main {
             maps[1] = new HashMap<>();
 
             int mapIdx = 0;
-            long initKey = initHash;
-            Map<Long, List<String>> map = maps[0];
-            Map<Long, List<String>> next = maps[1];
+            int initKey = initHash;
+            Map<Integer, List<String>> map = maps[0];
+            Map<Integer, List<String>> next = maps[1];
             map.put(initKey, new ArrayList<>());
             for (int i = 0; i < n; i++) {
                 String word = br.readLine();
@@ -31,7 +31,7 @@ public class Main {
             int sum = 0;
             int keyLength = 0;
             while (!map.isEmpty()) {
-                for (long key : map.keySet()) {
+                for (int key : map.keySet()) {
                     List<String> value = map.get(key);
                     
                     int visited = 0;
@@ -48,7 +48,7 @@ public class Main {
                         int nextIdx = nextChar -'a';
                         visited |= 1 << nextIdx;
 
-                        long nextKey = getHash(key, nextChar); 
+                        int nextKey = getHash(key, nextChar); 
                         if (!next.containsKey(nextKey)) next.put(nextKey, new ArrayList<>());
                         next.get(nextKey).add(word);
                     }
@@ -74,7 +74,7 @@ public class Main {
         bw.close();
     }
 
-    public static long getHash(long hash, char c) {
+    public static int getHash(int hash, char c) {
         return (hash * 26) + (c - 'a');
     } 
 }
