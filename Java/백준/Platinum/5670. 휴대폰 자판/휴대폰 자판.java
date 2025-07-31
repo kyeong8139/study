@@ -1,12 +1,14 @@
-import java.util.*;
 import java.io.*;
+import java.util.*;
 
 public class Main {
+
+    static long initHash = 31L;
 
     public static void main(String[] args) throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
         BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
-        Map<String, List<String>>[] maps = new HashMap[2];
+        Map<Long, List<String>>[] maps = new HashMap[2];
 
         while (true) {
             String input = br.readLine();
@@ -17,9 +19,9 @@ public class Main {
             maps[1] = new HashMap<>();
 
             int mapIdx = 0;
-            String initKey = "";
-            Map<String, List<String>> map = maps[0];
-            Map<String, List<String>> next = maps[1];
+            long initKey = initHash;
+            Map<Long, List<String>> map = maps[0];
+            Map<Long, List<String>> next = maps[1];
             map.put(initKey, new ArrayList<>());
             for (int i = 0; i < n; i++) {
                 String word = br.readLine();
@@ -27,25 +29,26 @@ public class Main {
             }
             
             int sum = 0;
+            int keyLength = 0;
             while (!map.isEmpty()) {
-                for (String key : map.keySet()) {
+                for (long key : map.keySet()) {
                     List<String> value = map.get(key);
                     
                     int visited = 0;
                     int cnt = 0;
-                    boolean needInput = (key.length() == 0);
+                    boolean needInput = (key == initKey);
                     for (String word : value) {
-                        if (word.length() == key.length()) {
+                        if (word.length() == keyLength) {
                             needInput = true;
                             continue;
                         }
                         
                         cnt++;
-                        char nextChar = word.charAt(key.length());
+                        char nextChar = word.charAt(keyLength);
                         int nextIdx = nextChar -'a';
                         visited |= 1 << nextIdx;
 
-                        String nextKey = word.substring(0, key.length()+1);
+                        long nextKey = getHash(key, nextChar); 
                         if (!next.containsKey(nextKey)) next.put(nextKey, new ArrayList<>());
                         next.get(nextKey).add(word);
                     }
@@ -60,6 +63,7 @@ public class Main {
                 mapIdx ^= 1;
                 map = maps[mapIdx];
                 next = maps[mapIdx^1];
+                keyLength++;
             }
 
             double answer = sum / (double) n;
@@ -69,4 +73,8 @@ public class Main {
         bw.flush();
         bw.close();
     }
+
+    public static long getHash(long hash, char c) {
+        return (hash * 26) + (c - 'a');
+    } 
 }
