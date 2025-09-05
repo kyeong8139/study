@@ -1,31 +1,36 @@
-import java.util.Scanner;
+import java.io.*;
 import java.util.*;
 
 public class Main {
-    public static void main(String[] args) {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        // Please write your code here.
+    public static void main(String[] args) throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(System.out));
+        int n = Integer.parseInt(br.readLine());
 
         List<Integer> list = new ArrayList<>();
         for (int i = 0 ; i < n; i++) {
-            String command = sc.next();
-            switch(command) {
+            StringTokenizer st = new StringTokenizer(br.readLine());
+            String command = st.nextToken();
+            switch (command) {
                 case "push_back":
-                    int num = sc.nextInt();
+                    int num = Integer.parseInt(st.nextToken());
                     list.add(num);
                     break;
                 case "pop_back":
                     list.remove(list.size() - 1);
                     break;
                 case "size":
-                    System.out.println(list.size());
+                    bw.write(String.valueOf(list.size()));
+                    bw.newLine();
                     break;
                 case "get" :
-                    int idx = sc.nextInt() - 1;
-                    System.out.println(list.get(idx));
+                    int idx = Integer.parseInt(st.nextToken()) - 1;
+                    bw.write(String.valueOf(list.get(idx)));
+                    bw.newLine();
                     break;
             }
         }
+        bw.flush();
+        bw.close();
     }
 }
