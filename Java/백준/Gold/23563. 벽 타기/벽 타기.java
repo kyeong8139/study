@@ -57,11 +57,16 @@ public class Main {
             }
         }
 
+        int answer = 0;
         while (!pq.isEmpty()) {
             Pos cur = pq.poll();
             if (times[cur.row][cur.col] <= cur.time) continue;
 
             times[cur.row][cur.col] = cur.time;
+            if (board[cur.row][cur.col] == 'E') {
+                answer = cur.time;
+                break;
+            }
             
             for (int[] dir : dirs) {
                 int nextRow = cur.row + dir[0];
@@ -77,13 +82,6 @@ public class Main {
             }
         }
 
-        for (int r = 0; r < h; r++) {
-            for (int c = 0; c < w; c++) {
-                if (board[r][c] == 'E') {
-                    System.out.println(times[r][c]);
-                    break;
-                }
-            }
-        }
+        System.out.println(answer);
     }
 }
